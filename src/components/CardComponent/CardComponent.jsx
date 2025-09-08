@@ -11,7 +11,7 @@ const CardComponent = () => {
     <div className="product__container">
       {productList.map((product) => {
         return (
-          <Card className="product__card">
+          <Card key= {product.id} className="product__card">
             <Card.Img
               variant="top"
               src={product.image}

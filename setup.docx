@@ -11,6 +11,6 @@ Bọc Provider thằng App trong main.jsjs --> Set state, middleware cac thu do
 4. Các folder: components, pages,routes, hooks
 5. Tạo ảnh trượt slider bằng  npm install react-slick --save
 6. Tạo cardcomponent
-
-heheeheheheh
-quacquac
+7. Tạo trang product detail
+8. Tạo trang sign in, sign up
+9. Tạo folder Service -> file UserService và các file service khác để call api

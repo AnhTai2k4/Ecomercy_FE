@@ -53,7 +53,7 @@
   width: 25px;
   height: 25px;
 }
-a {
+.link__text {
   font-size: 16px;
   text-decoration: none;
   color: rgb(133, 130, 130);

@@ -2,11 +2,15 @@ import "./HeaderComponent.css";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import "../../pages/HomePage/HomePage.css"
+import "../../pages/HomePage/HomePage.css";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function HeaderComponent() {
   const navigate = useNavigate();
+
+  const user = useSelector((state) => state.user);
+  console.log("user ne", user);
   const typeProduct = [
     "Thịt, rau củ",
     "Bách hóa",
@@ -22,7 +26,7 @@ export default function HeaderComponent() {
     "Giày nữ",
     "Túi nữ",
   ];
-  
+
   return (
     <>
       <div className="introduce__container">
@@ -40,7 +44,9 @@ export default function HeaderComponent() {
             className="img__logo--brand"
             src="https://salt.tikicdn.com/ts/upload/0e/07/78/ee828743c9afa9792cf20d75995e134e.png"
             alt="Anh logo"
-            onClick={()=>{navigate("/")}}
+            onClick={() => {
+              navigate("/");
+            }}
           />
           <div className="sreach__container"></div>
 
@@ -67,11 +73,24 @@ export default function HeaderComponent() {
               alt=""
               className="img__logo--account"
             />
-            <span style={{ marginLeft: "10px" }}>
-              <a href="/sign-in">Đăng nhập</a>
-              <span style={{ fontSize: "18px" }}> / </span>
-              <a href="/sign-up">Đăng ký</a>
-            </span>
+
+            {user?.name ? (
+              <span style={{ marginLeft: "10px" }}>
+                <div className="link__text" href="/sign-in">
+                  {user?.name}
+                </div>
+              </span>
+            ) : (
+              <span style={{ marginLeft: "10px" }}>
+                <a className="link__text" href="/sign-in">
+                  Đăng nhập
+                </a>
+                <span style={{ fontSize: "18px" }}> / </span>
+                <a className="link__text" href="/sign-up">
+                  Đăng ký
+                </a>
+              </span>
+            )}
           </div>
 
           <div className="cart__container">
@@ -81,7 +100,9 @@ export default function HeaderComponent() {
               className="img__logo--account"
             />
             <span style={{ marginLeft: "10px" }}>
-              <a href="https://www.google.com">Giỏ hàng</a>
+              <a className="link__text" href="https://www.google.com">
+                Giỏ hàng
+              </a>
             </span>
           </div>
         </div>
@@ -92,9 +113,9 @@ export default function HeaderComponent() {
       <div className="TypeProduct__container">
         {typeProduct.map((type) => {
           return (
-            <>
-              <div class="TypeProduct__card">{type}</div>
-            </>
+            <div key={type} className="TypeProduct__card">
+              {type}
+            </div>
           );
         })}
       </div>
