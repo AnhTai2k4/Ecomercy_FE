@@ -10,7 +10,7 @@ export default function HeaderComponent() {
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.user);
-  console.log("user ne", user);
+
   const typeProduct = [
     "Thịt, rau củ",
     "Bách hóa",

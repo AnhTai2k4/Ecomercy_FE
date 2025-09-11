@@ -4,6 +4,7 @@ const initialState = {
   name: '',
   email: '',
   access_token: '',
+  
 }
 
 export const userSlice = createSlice({
@@ -16,7 +17,7 @@ export const userSlice = createSlice({
         // state.access_token = action.payload.access_token
 
         const {name, email, access_token} = action.payload
-        console.log("action ne", action);
+        
 
         state.name = name || email
         state.email = email
