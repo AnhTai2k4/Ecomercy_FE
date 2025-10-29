@@ -5,6 +5,9 @@ import InputGroup from "react-bootstrap/InputGroup";
 import "../../pages/HomePage/HomePage.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { logoutUser, getDetailUser } from "../../../service/UserService";
+import { getCookie } from "../../utils";
+import { jwtDecode } from "jwt-decode";
 
 export default function HeaderComponent() {
   const navigate = useNavigate();
@@ -26,6 +29,35 @@ export default function HeaderComponent() {
     "Giày nữ",
     "Túi nữ",
   ];
+
+  const handleLogout = async () => {
+    // Xóa thông tin người dùng khỏi Redux
+    // dispatch(logout());
+    // Chuyển hướng về trang đăng nhập
+    try{
+      // const cookie = getCookie("Refresh_token");
+      // console.log("Cookie de logout ne", cookie);
+      // const response = await logoutUser('cookie');
+      // console.log("Logout response:", response);
+      const access_token= localStorage.getItem('access_token')
+      console.log("access_token de logout", access_token)
+      localStorage.removeItem('access_token')
+      navigate("/sign-in"); 
+    }
+    catch(error){
+      console.error("Logout failed:", error);
+    }
+  }
+
+  const handleGetDetailUser = async () => {
+    
+    try{
+      navigate("/detail-user");
+    }
+    catch(error){
+      console.error("navigate detail user failed:", error);
+    }
+  }
 
   return (
     <>
@@ -68,11 +100,35 @@ export default function HeaderComponent() {
           </InputGroup>
 
           <div className="login__container">
-            <img
-              src="https://cdn1.iconfinder.com/data/icons/material-core/20/account-circle-1024.png"
-              alt=""
-              className="img__logo--account"
-            />
+
+            <div class="dropdown">
+              <img
+                class= "btn btn-secondary dropdown-toggle"
+                src="https://cdn1.iconfinder.com/data/icons/material-core/20/account-circle-1024.png"
+                alt=""
+                className= "img__logo--account"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{cursor: "pointer"}}
+              />
+                
+              <div class="dropdown-menu">
+                <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}} onClick={() => handleGetDetailUser()}>
+                  Thông tin cá nhân
+                </button>
+                <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}}>
+                  Quản trị viên
+                </button>
+                <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}} onClick={() => handleLogout()}>
+                  Cài đặt bảo mật
+                </button>
+                <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}} onClick={() => handleLogout()}>
+                  Đăng xuất
+                </button>
+                
+              </div>
+            </div>
 
             {user?.name ? (
               <span style={{ marginLeft: "10px" }}>

@@ -21,7 +21,7 @@ export default function App() {
    
     if (storageData && isJsonString(storageData)) {
       storageData = JSON.parse(storageData);
-      decoded = jwtDecode(storageData); ///Notice
+      decoded = jwtDecode(storageData); ///----------------Notice----------------------------
       console.log("decode ne: ",decoded)
     }
     return { decoded, storageData };

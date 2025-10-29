@@ -3,29 +3,28 @@ import "./SignInPage.css";
 import { getDetailUser, loginUser } from "../../../service/UserService";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
-import { useDispatch } from "react-redux";  
+import { jwtDecode } from "jwt-decode";
+import { useDispatch } from "react-redux";
 import { updateUser } from "../../redux/slices/userSlice";
 
 const SignInPage = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const mutation = useMutation({
-  mutationFn: (data) => loginUser(data),
-});
+    mutationFn: (data) => loginUser(data),
+  });
 
-  const {data, isLoading, isError, isSuccess} = mutation;
+  const { data, isLoading, isError, isSuccess } = mutation;
   console.log("mutation", mutation);
 
-   const handleGetDetailUser = async (id, access_token) => {
+  const handleGetDetailUser = async (id, access_token) => {
     try {
       const res = await getDetailUser(id, access_token);
-      dispatch(updateUser({...res?.data, access_token: access_token}))
+      dispatch(updateUser({ ...res?.data, access_token: access_token }));
       console.log("res ne", res);
-
     } catch (error) {
       console.log("Failed to fetch user details:", error);
     }
@@ -34,23 +33,23 @@ const SignInPage = () => {
   useEffect(() => {
     if (isSuccess) {
       navigate("/");
-     
-     localStorage.setItem('access_token', JSON.stringify(data.data?.Access_token))
-     console.log("access_token", data.data?.Access_token)
-     const decoded = jwtDecode(data.data?.Access_token);
-     console.log("decoded ne", decoded);
 
-     if(decoded?.id){
-       handleGetDetailUser(decoded?.id, data.data?.Access_token)
-     }
-     
+      localStorage.setItem(
+        "access_token",
+        JSON.stringify(data.data?.Access_token)
+      );
+      console.log("access_token", data.data?.Access_token);
+      const decoded = jwtDecode(data.data?.Access_token);
+      console.log("decoded ne", decoded);
+
+      if (decoded?.id) {
+        handleGetDetailUser(decoded?.id, data.data?.Access_token);
+      }
     }
   }, [isSuccess, navigate]);
 
- 
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -58,8 +57,8 @@ const SignInPage = () => {
   };
 
   const handleSubmit = () => {
-    mutation.mutate({ email, password });
-    console.log("Email:", email);
+    mutation.mutate({ username, password });
+    console.log("username:", username);
     console.log("Password:", password);
   };
   return (
@@ -71,10 +70,10 @@ const SignInPage = () => {
 
           <input
             className="input__form"
-            type="email"
+            type="username"
             placeholder="abc@gmail.com"
-            value={email}
-            onChange={handleEmailChange}
+            value={username}
+            onChange={handleUsernameChange}
           />
           <br />
           <input
@@ -85,7 +84,11 @@ const SignInPage = () => {
             onChange={handlePasswordChange}
           />
 
-          {mutation.isError && <p style={{fontSize: "small", marginTop:"0px", color:"red"}}>Tài khoản không hợp lệ</p>}
+          {mutation.isError && (
+            <p style={{ fontSize: "small", marginTop: "0px", color: "red" }}>
+              Tài khoản không hợp lệ
+            </p>
+          )}
 
           <button className="button__form" onClick={handleSubmit}>
             Đăng nhập
