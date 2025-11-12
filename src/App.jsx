@@ -18,6 +18,7 @@ export default function App() {
   const handleDecode = () => {
     let storageData = localStorage.getItem("access_token");
     let decoded = {};
+    console.log("Access token o Storage sau dang nhap", storageData)
    
     if (storageData && isJsonString(storageData)) {
       storageData = JSON.parse(storageData);

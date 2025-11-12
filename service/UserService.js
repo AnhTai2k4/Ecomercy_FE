@@ -3,6 +3,7 @@ import {
   startRegistration,
   startAuthentication,
 } from "@simplewebauthn/browser";
+import { useNavigate } from "react-router";
 
 const axiosJWT = axios.create();
 const axiosInstance = axios.create();
@@ -12,9 +13,36 @@ const loginUser = async (data) => {
     data,
     { withCredentials: true }
   );
-  return res.data;
+  return res.data.data;
 };
 
+const loginUserWebauthn = async ({ username }) => {
+  try {
+    const res = await axiosJWT.post(
+      "http://localhost:3001/api/user/login/option",
+      { username }
+    );
+
+    const options = await res.data;
+    const authResp = await startAuthentication(options);
+
+    if (authResp) {
+      const verifyRes = await axios.post(
+        "http://localhost:3001/api/user/login/verify",
+        { username, authResp }
+      );
+
+      const result = await verifyRes.data;
+      console.log("result", result);
+      if (result) return result;
+    }
+    
+  } catch (err) {
+    console.log(err.response.data.message)
+    throw err
+  } finally {
+  }
+};
 const registerUser = async (data) => {
   const res = await axiosJWT.post(
     "http://localhost:3001/api/user/sign-up",
@@ -23,29 +51,18 @@ const registerUser = async (data) => {
   return res.data;
 };
 
-const registerUserWebauthn = async ({username}) => {
+const registerUserWebauthn = async ({ username }) => {
   try {
-    
     // console.log(username)
     // Gọi BE lấy challenge đăng ký
-    const res = await fetch(
-        "http://localhost:3001/api/user/register/option",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        }
-      );
+    const res = await axiosJWT.post(
+      "http://localhost:3001/api/user/register/option",
+      { username }
+    );
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      console.log(errorData)
-      throw new Error(errorData.error || "Lỗi từ server");
-    }
-
-    const data = await res.json();
-    const options = data.option
-    console.log(options)
+    const options = res.data.option;
+    
+    console.log(options);
 
     if (!options.challenge) {
       throw new Error("Backend không trả về challenge. Kiểm tra BE logs!");
@@ -54,28 +71,63 @@ const registerUserWebauthn = async ({username}) => {
     // Gọi API WebAuthn của trình duyệt
     console.log(" Starting WebAuthn registration with options:", options);
     const attResp = await startRegistration(options);
+    if (!attResp) {
+      throw new Error("Vui lòng xác thực WebAuthn");
+    }
     console.log(" WebAuthn registration response:", attResp);
 
     // Gửi lại để verify
-    const verifyRes = await fetch(
+    const verifyRes = await axiosJWT.post(
       "http://localhost:3001/api/user/register/verify",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, attResp }),
-      }
+      { username, attResp }
     );
 
-    if (!verifyRes.ok) {
-      const errorData = await verifyRes.json();
-      throw new Error(errorData.error || "Xác minh thất bại");
+    const result = await verifyRes.data;
+    alert(result.message);
+    return result;
+  } catch (err) {
+    console.error("Register error:", err.response.data.message);
+    throw err
+  }
+};
+
+const addRegister = async ({ username }) => {
+  try {
+    // console.log(username)
+    // Gọi BE lấy challenge đăng ký
+    const res = await axiosJWT.post(
+      "http://localhost:3001/api/user/register/add",
+      { username }
+    );
+
+    const options = res.data.option;
+    
+    console.log(options);
+
+    if (!options.challenge) {
+      throw new Error("Backend không trả về challenge. Kiểm tra BE logs!");
     }
 
-    const result = await verifyRes.json();
-    alert(result.message)
-    return result
+    // Gọi API WebAuthn của trình duyệt
+    console.log(" Starting WebAuthn registration with options:", options);
+    const attResp = await startRegistration(options);
+    if (!attResp) {
+      throw new Error("Vui lòng xác thực WebAuthn");
+    }
+    console.log(" WebAuthn registration response:", attResp);
+
+    // Gửi lại để verify
+    const verifyRes = await axiosJWT.post(
+      "http://localhost:3001/api/user/register/addVerify",
+      { username, attResp }
+    );
+
+    const result = await verifyRes.data;
+    if(result) alert("Tạo Webauthn thành công ");
+    return result;
   } catch (err) {
-    console.error("Register error:", err);
+    console.error("Register error:", err.response.data.message);
+    throw err
   }
 };
 
@@ -118,7 +170,9 @@ const logoutUser = async (data) => {
 
 export {
   loginUser,
+  loginUserWebauthn,
   registerUser,
+  addRegister,
   registerUserWebauthn,
   getDetailUser,
   refreshToken,

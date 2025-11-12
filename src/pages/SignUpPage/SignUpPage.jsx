@@ -10,12 +10,13 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [way, setWay] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const mutation = useMutation({
-    mutationFn: async ({type, data}) => {
+    mutationFn: async ({ type, data }) => {
       if (type === "password") return await registerUser(data);
-      else if(type==="webauthn") {
+      else if (type === "webauthn") {
         console.log(data)
         return await registerUserWebauthn(data);
       }
@@ -23,8 +24,24 @@ const SignUpPage = () => {
     onSuccess: (data) => {
       console.log("✅ Thành công:", data);
     },
-    onError: (error) => console.error("❌ Lỗi:", error),
+    onError: (error) => {
+      console.error("❌ Lỗi:", error);
+      setError(error.response.data.message || "Đăng ký thất bại");
+    },
   });
+
+  const validatePassword = (password, confirmPassword) => {
+    if(password.length < 8) {
+      setError("Mật khẩu phải có ít nhất 8 ký tự");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      setError("Mật khẩu và mật khẩu xác nhận không khớp");
+      return false;
+    }
+    return true;
+  };
+
 
   const handleUsernameChange = (e) => {
     setUsername(e.target.value);
@@ -42,9 +59,11 @@ const SignUpPage = () => {
     console.log("username:", username);
     console.log("Password:", password);
     console.log("Confirm Password:", confirmPassword);
+    if(way === "password" && validatePassword(password, confirmPassword) === false) return;
+
     if (way === "password")
-      mutation.mutate({type:way, data: {username, password, confirmPassword} });
-    else if(way ==="webauthn") mutation.mutate({type:way, data: {username} });
+      mutation.mutate({ type: way, data: { username, password, confirmPassword } });
+    else if (way === "webauthn") mutation.mutate({ type: way, data: { username } });
   };
 
   useEffect(() => {
@@ -55,7 +74,7 @@ const SignUpPage = () => {
       }, 1000);
     }
   }, [mutation.data, navigate]);
-  
+
 
   if (!way) {
     return (
@@ -70,7 +89,7 @@ const SignUpPage = () => {
             }}
           >
             <h1>Xin chào</h1>
-            <p>Tạo tài khoản</p>
+            <p>Mời lựa chọn phương thức đăng ký</p>
 
             <button className="button__form" onClick={() => setWay("password")}>
               Đăng ký bằng mật khẩu
@@ -118,29 +137,29 @@ const SignUpPage = () => {
                 type="username"
                 placeholder="username"
                 value={username}
-                onChange={handleUsernameChange}
+                onChange={(e)=>{handleUsernameChange(e); setError("")}}
               />
-              <br />
+
               <input
                 className="input__form"
                 type="password"
                 placeholder="password"
                 value={password}
-                onChange={handlePasswordChange}
+                onChange={(e)=>{handlePasswordChange(e); setError("")}}
               />
               <input
                 className="input__form"
                 type="password"
                 placeholder="confirm password"
                 value={confirmPassword}
-                onChange={handleConfirmPasswordChange}
+                onChange={(e)=>{handleConfirmPasswordChange(e); setError("")}}
               />
 
-              {mutation.isError && (
+              {error && (
                 <p
                   style={{ fontSize: "small", marginTop: "0px", color: "red" }}
                 >
-                  Thông tin không hợp lệ
+                  {error}
                 </p>
               )}
             </>
@@ -152,11 +171,11 @@ const SignUpPage = () => {
                 type="username"
                 placeholder="Username"
                 value={username}
-                onChange={handleUsernameChange}
+                onChange={(e)=>{handleUsernameChange(e); setError("")}}
               />
-              <br />
 
-              {mutation.isError && (
+
+              {error && (
                 <p
                   style={{
                     fontSize: "small",
@@ -164,7 +183,7 @@ const SignUpPage = () => {
                     color: "red",
                   }}
                 >
-                  Username không tồn tại
+                  {error}
                 </p>
               )}
             </>
