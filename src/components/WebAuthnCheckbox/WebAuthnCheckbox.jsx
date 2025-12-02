@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from "react";
 
-function WebAuthnCheckbox({ user, setAddWebAuthn, setRemoveWebAuthn }) {
-  const [isChecked, setIsChecked] = useState(false);
+function TwoFactorCheckbox({ user, setAddTwoFactorAuth, setRemoveTwoFactorAuth }) {
+  const [isChecked, setIsChecked] = useState(!!user.isTwoFactorAuth);
 
   // Đồng bộ ban đầu với user.credential
   useEffect(() => {
-    console.log(user.credential)
-    setIsChecked(!!user.credential);
-  }, [user.credential]);
+    console.log(user.isTwoFactorAuth)
+    setIsChecked(!!user.isTwoFactorAuth);
+  }, [user.isTwoFactorAuth]);
 
   const handleChange = () => {
     if (isChecked) {
       // Đang checked => bỏ check
       setIsChecked(false);
-      setRemoveWebAuthn(true);
+      setRemoveTwoFactorAuth(true);
+      setAddTwoFactorAuth(false);
     } else {
       // Đang unchecked => check
       setIsChecked(true);
-      setAddWebAuthn(true);
+      setAddTwoFactorAuth(true);
+      setRemoveTwoFactorAuth(false);
     }
   };
 
@@ -31,4 +33,4 @@ function WebAuthnCheckbox({ user, setAddWebAuthn, setRemoveWebAuthn }) {
   );
 }
 
-export default WebAuthnCheckbox;
+export default TwoFactorCheckbox;

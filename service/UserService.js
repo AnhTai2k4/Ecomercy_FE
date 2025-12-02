@@ -38,7 +38,36 @@ const loginUserWebauthn = async ({ username }) => {
     }
     
   } catch (err) {
-    console.log(err.response.data.message)
+    console.log(err.response?.data?.message || err.message)
+    throw err
+  } finally {
+  }
+};
+
+// Xác thực bước 2 cho 2FA (sau khi đã xác thực mật khẩu)
+const loginUserWebauthnTwoFactor = async ({ username }) => {
+  try {
+    const res = await axiosJWT.post(
+      "http://localhost:3001/api/user/login/option",
+      { username }
+    );
+
+    const options = await res.data;
+    const authResp = await startAuthentication(options);
+
+    if (authResp) {
+      const verifyRes = await axios.post(
+        "http://localhost:3001/api/user/login/verify-two-factor",
+        { username, authResp }
+      );
+
+      const result = await verifyRes.data;
+      console.log("result", result);
+      if (result) return result;
+    }
+    
+  } catch (err) {
+    console.log(err.response?.data?.message || err.message)
     throw err
   } finally {
   }
@@ -91,7 +120,7 @@ const registerUserWebauthn = async ({ username }) => {
   }
 };
 
-const addRegister = async ({ username }) => {
+const addRegister = async ({ username, deviceName }) => {
   try {
     // console.log(username)
     // Gọi BE lấy challenge đăng ký
@@ -119,7 +148,7 @@ const addRegister = async ({ username }) => {
     // Gửi lại để verify
     const verifyRes = await axiosJWT.post(
       "http://localhost:3001/api/user/register/addVerify",
-      { username, attResp }
+      { username, attResp, deviceName }
     );
 
     const result = await verifyRes.data;
@@ -129,6 +158,46 @@ const addRegister = async ({ username }) => {
     console.error("Register error:", err.response.data.message);
     throw err
   }
+};
+
+const getWebauthnCredentials = async ({ userId, access_token }) => {
+  const res = await axiosJWT.get(
+    `http://localhost:3001/api/user/credentials/${userId}`,
+    {
+      headers: { token: `Bearer ${access_token}` },
+    }
+  );
+  return res.data;
+};
+
+const deleteWebauthnCredential = async ({
+  userId,
+  credentialId,
+  access_token,
+}) => {
+  const res = await axiosJWT.delete(
+    `http://localhost:3001/api/user/credentials/${userId}/${credentialId}`,
+    {
+      headers: { token: `Bearer ${access_token}` },
+    }
+  );
+  return res.data;
+};
+
+const renameWebauthnCredential = async ({
+  userId,
+  credentialId,
+  name,
+  access_token,
+}) => {
+  const res = await axiosJWT.patch(
+    `http://localhost:3001/api/user/credentials/${userId}/${credentialId}`,
+    { name },
+    {
+      headers: { token: `Bearer ${access_token}` },
+    }
+  );
+  return res.data;
 };
 
 const getDetailUser = async (id, access_token) => {
@@ -168,9 +237,18 @@ const logoutUser = async (data) => {
   return res.data;
 };
 
+const checkUsername = async ({ username }) => {
+  const res = await axiosJWT.post(
+    "http://localhost:3001/api/user/check-username",
+    { username }
+  );
+  return res.data;
+};
+
 export {
   loginUser,
   loginUserWebauthn,
+  loginUserWebauthnTwoFactor,
   registerUser,
   addRegister,
   registerUserWebauthn,
@@ -179,4 +257,8 @@ export {
   axiosJWT,
   logoutUser,
   putUser,
+  getWebauthnCredentials,
+  deleteWebauthnCredential,
+  renameWebauthnCredential,
+  checkUsername,
 };

@@ -9,7 +9,7 @@ const SignUpPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [way, setWay] = useState("");
+  const [way, setWay] = useState("password");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ const SignUpPage = () => {
   });
 
   const validatePassword = (password, confirmPassword) => {
-    if(password.length < 8) {
+    if (password.length < 8) {
       setError("Mật khẩu phải có ít nhất 8 ký tự");
       return false;
     }
@@ -59,7 +59,7 @@ const SignUpPage = () => {
     console.log("username:", username);
     console.log("Password:", password);
     console.log("Confirm Password:", confirmPassword);
-    if(way === "password" && validatePassword(password, confirmPassword) === false) return;
+    if (way === "password" && validatePassword(password, confirmPassword) === false) return;
 
     if (way === "password")
       mutation.mutate({ type: way, data: { username, password, confirmPassword } });
@@ -76,53 +76,6 @@ const SignUpPage = () => {
   }, [mutation.data, navigate]);
 
 
-  if (!way) {
-    return (
-      <div className="signup__container">
-        <div className="signup__card">
-          <div
-            className="signup__item--1"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <h1>Xin chào</h1>
-            <p>Mời lựa chọn phương thức đăng ký</p>
-
-            <button className="button__form" onClick={() => setWay("password")}>
-              Đăng ký bằng mật khẩu
-            </button>
-            <button
-              className="button__form button__form--webauthn"
-              onClick={() => setWay("webauthn")}
-            >
-              Đăng ký bằng WebAuthn
-            </button>
-            <br />
-
-            <span className="span__item" style={{ display: "flex" }}>
-              Đã có tài khoản?
-              <a className="a__item" href="/sign-in">
-                Đăng nhập
-              </a>
-            </span>
-          </div>
-          <div className="signup__item--2">
-            <img
-              src="https://salt.tikicdn.com/ts/upload/df/48/21/b4d225f471fe06887284e1341751b36e.png"
-              alt=""
-              className="signup__img"
-            />
-            <h3>Mua sắm tại Tiki</h3>
-            <p style={{ margin: "0px" }}>Siêu ưu đãi mỗi ngày</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="signup__container">
       <div className="signup__card">
@@ -130,64 +83,40 @@ const SignUpPage = () => {
           <h1>Xin chào</h1>
           <p>Tạo tài khoản</p>
           {/**-------------Đăng ký bằng mật khẩu-------------------- */}
-          {way === "password" ? (
-            <>
-              <input
-                className="input__form"
-                type="username"
-                placeholder="username"
-                value={username}
-                onChange={(e)=>{handleUsernameChange(e); setError("")}}
-              />
 
-              <input
-                className="input__form"
-                type="password"
-                placeholder="password"
-                value={password}
-                onChange={(e)=>{handlePasswordChange(e); setError("")}}
-              />
-              <input
-                className="input__form"
-                type="password"
-                placeholder="confirm password"
-                value={confirmPassword}
-                onChange={(e)=>{handleConfirmPasswordChange(e); setError("")}}
-              />
+          <>
+            <input
+              className="input__form"
+              type="username"
+              placeholder="username"
+              value={username}
+              onChange={(e) => { handleUsernameChange(e); setError("") }}
+            />
 
-              {error && (
-                <p
-                  style={{ fontSize: "small", marginTop: "0px", color: "red" }}
-                >
-                  {error}
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              {/**-------------Đăng ký bằng Webauthn-------------------- */}
-              <input
-                className="input__form"
-                type="username"
-                placeholder="Username"
-                value={username}
-                onChange={(e)=>{handleUsernameChange(e); setError("")}}
-              />
+            <input
+              className="input__form"
+              type="password"
+              placeholder="password"
+              value={password}
+              onChange={(e) => { handlePasswordChange(e); setError("") }}
+            />
+            <input
+              className="input__form"
+              type="password"
+              placeholder="confirm password"
+              value={confirmPassword}
+              onChange={(e) => { handleConfirmPasswordChange(e); setError("") }}
+            />
 
+            {error && (
+              <p
+                style={{ fontSize: "small", marginTop: "0px", color: "red" }}
+              >
+                {error}
+              </p>
+            )}
+          </>
 
-              {error && (
-                <p
-                  style={{
-                    fontSize: "small",
-                    marginTop: "0px",
-                    color: "red",
-                  }}
-                >
-                  {error}
-                </p>
-              )}
-            </>
-          )}
 
           <button className="button__form" onClick={handleSignUp}>
             Đăng ký

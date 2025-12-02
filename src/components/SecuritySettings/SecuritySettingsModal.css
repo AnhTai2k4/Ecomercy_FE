@@ -1,0 +1,146 @@
+.security-modal__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.security-modal__content {
+  background-color: #fff;
+  width: 90%;
+  max-width: 640px;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 45px rgba(17, 24, 39, 0.25);
+  animation: security-modal-fade-in 0.2s ease-out;
+}
+
+.security-modal__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.security-modal__header h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.security-modal__header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.security-modal__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.security-modal__body {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.security-modal__error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.security-device__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.security-device__item {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.security-device__name {
+  font-weight: 600;
+  margin: 0;
+}
+
+.security-device__meta {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.security-device__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.security-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s linear;
+}
+
+.security-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.security-btn--primary {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+.security-btn--ghost {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.security-btn--danger {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.security-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@keyframes security-modal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

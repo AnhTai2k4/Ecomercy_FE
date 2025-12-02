@@ -8,11 +8,14 @@ import { useSelector } from "react-redux";
 import { logoutUser, getDetailUser } from "../../../service/UserService";
 import { getCookie } from "../../utils";
 import { jwtDecode } from "jwt-decode";
+import { useState } from "react";
+import SecuritySettingsModal from "../SecuritySettings/SecuritySettingsModal";
 
 export default function HeaderComponent() {
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.user);
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
 
   const typeProduct = [
     "Thịt, rau củ",
@@ -120,7 +123,7 @@ export default function HeaderComponent() {
                 <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}}>
                   Quản trị viên
                 </button>
-                <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}} onClick={() => handleLogout()}>
+                <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}} onClick={() => setShowSecurityModal(true)}>
                   Cài đặt bảo mật
                 </button>
                 <button class="dropdown-item" style={{cursor: "pointer", fontSize: "16px"}} onClick={() => handleLogout()}>
@@ -177,6 +180,10 @@ export default function HeaderComponent() {
       </div>
       <br />
       <hr />
+      <SecuritySettingsModal
+        isOpen={showSecurityModal}
+        onClose={() => setShowSecurityModal(false)}
+      />
     </>
   );
 }

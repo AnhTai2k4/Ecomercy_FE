@@ -7,6 +7,8 @@ const initialState = {
   isAdmin: false,
   password: '',
   credential: '',
+  credentials: '',
+  isTwoFactorAuth:''
 }
 
 export const userSlice = createSlice({
@@ -18,7 +20,7 @@ export const userSlice = createSlice({
         // state.username = action.payload.username
         // state.access_token = action.payload.access_token
 
-        const {name, username, access_token, isAdmin,password, credential} = action.payload
+        const {name, username, access_token, isAdmin,password, credential, credentials, isTwoFactorAuth} = action.payload
         
 
         state.name = name || username
@@ -27,6 +29,8 @@ export const userSlice = createSlice({
         state.isAdmin = isAdmin
         state.password = password
         state.credential = credential
+        state.credentials = credentials
+        state.isTwoFactorAuth= isTwoFactorAuth
     },
     
   },
