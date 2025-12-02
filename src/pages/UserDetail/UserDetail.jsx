@@ -47,7 +47,7 @@ const UserDetail = () => {
         // Nếu chưa có credentials, thêm thiết bị đầu tiên
         const username = user.username;
         try {
-          const result = await addRegister({username});
+      const result = await addRegister({username});
           // result từ addRegister là { data: user.credentials } từ controller
           if(result && result.data) {
             // Sau khi đăng ký thành công, gọi lại getDetailUser để lấy thông tin user mới nhất (bao gồm credentials)
@@ -66,7 +66,7 @@ const UserDetail = () => {
           console.error("Error adding credential:", error);
           alert("Không thể thêm thiết bị WebAuthn: " + (error.response?.data?.message || error.message));
           return;
-        }
+    }
       } else {
         // Nếu đã có credentials, chỉ bật 2FA
         const updatedUser = { ...user, isTwoFactorAuth: true };

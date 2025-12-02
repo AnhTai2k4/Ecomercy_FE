@@ -138,7 +138,10 @@ const SignInPage = () => {
         navigate("/");
       }
     } catch (error) {
-      setErrorMessage("Sai mật khẩu hoặc tài khoản không hợp lệ");
+      // Hiển thị đúng message backend trả về (khóa tài khoản, sai mật khẩu, ...)
+      const backendMessage =
+        error?.response?.data?.message || "Sai mật khẩu hoặc tài khoản không hợp lệ";
+      setErrorMessage(backendMessage);
       console.error("Password login error:", error);
     }
   };
