@@ -16,7 +16,7 @@ const SignInPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const user = useSelector((state) => state.user);
-  const [step, setStep] = useState(1); // 1 = nhập username, 2 = đăng nhập, 3 = xác thực WebAuthn (cho 2FA)
+  const [step, setStep] = useState(1); // 1 = nhập username, 2 = đăng nhập, 3 = xác thực WebAuthn (cho 2FA), 0: Thay đổi phương thức đăng 
   const [loginType, setLoginType] = useState(""); // "webauthn" hoặc "password"
   const [isTwoFactorAuth, setIsTwoFactorAuth] = useState(false);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
@@ -56,16 +56,16 @@ const SignInPage = () => {
 
     try {
       const res = await checkUsername({ username });
-      
+
       console.log("Response from checkUsername:", res);
       console.log("hasWebAuthnCredentials:", res?.data?.hasWebAuthnCredentials);
       console.log("isTwoFactorAuth:", res?.data?.isTwoFactorAuth);
-      
+
       const hasCredentials = res?.data?.hasWebAuthnCredentials;
       const is2FA = res?.data?.isTwoFactorAuth;
-      
+
       setIsTwoFactorAuth(is2FA);
-      
+
       // Nếu bật 2FA, luôn bắt đầu bằng mật khẩu
       if (is2FA) {
         setLoginType("password");
@@ -92,15 +92,15 @@ const SignInPage = () => {
   const handleWebAuthnLogin = async () => {
     try {
       const result = await loginUserWebauthn({ username });
-      
+
       if (result?.Access_token) {
         localStorage.setItem("access_token", JSON.stringify(result.Access_token));
         const decoded = jwtDecode(result.Access_token);
-        
+
         if (decoded?.id) {
           await handleGetDetailUser(decoded?.id, result.Access_token);
         }
-        
+
         navigate("/");
       }
     } catch (error) {
@@ -118,23 +118,23 @@ const SignInPage = () => {
 
     try {
       const result = await loginUser({ username, password });
-      
+
       // Nếu bật 2FA, chỉ xác thực mật khẩu, chuyển sang bước 2 (WebAuthn)
       if (result?.requiresTwoFactor) {
         setStep(3); // Chuyển sang bước xác thực WebAuthn
         setErrorMessage("");
         return;
       }
-      
+
       // Nếu không bật 2FA, đăng nhập thành công
       if (result?.Access_token) {
         localStorage.setItem("access_token", JSON.stringify(result.Access_token));
         const decoded = jwtDecode(result.Access_token);
-        
+
         if (decoded?.id) {
           await handleGetDetailUser(decoded?.id, result.Access_token);
         }
-        
+
         navigate("/");
       }
     } catch (error) {
@@ -147,15 +147,15 @@ const SignInPage = () => {
   const handleWebAuthnTwoFactor = async () => {
     try {
       const result = await loginUserWebauthnTwoFactor({ username });
-      
+
       if (result?.Access_token) {
         localStorage.setItem("access_token", JSON.stringify(result.Access_token));
         const decoded = jwtDecode(result.Access_token);
-        
+
         if (decoded?.id) {
           await handleGetDetailUser(decoded?.id, result.Access_token);
         }
-        
+
         navigate("/");
       }
     } catch (error) {
@@ -197,51 +197,59 @@ const SignInPage = () => {
     }
   };
 
+  const handleChangeLoginType = () => {
+    setStep(0);
+    setLoginType("");
+    setPassword("");
+    setIsTwoFactorAuth(false);
+    setErrorMessage("");
+  };
+
   //-----------------------Select way signin----------------------------
-  // if (way === "") {
-  //  return (
-  //     <div className="signin__container">
-  //       <div className="signin__card">
-  //         {/**----------------Signin Left------------------------------ */}
+  if (step === 0) {
+   return (
+      <div className="signin__container">
+        <div className="signin__card">
+          {/**----------------Signin Left------------------------------ */}
 
-  //         <div className="signin__item--1">
-  //           <h1>Xi n chào</h1>
-  //           <p>Mời lựa chọn phương thức đăng nhập</p>
+          <div className="signin__item--1">
+            <h1>Xi n chào</h1>
+            <p>Mời lựa chọn phương thức đăng nhập</p>
 
-  //           <button className="button__form" onClick={() => setWay("password")}>
-  //             Đăng nhập bằng mật khẩu
-  //           </button>
+            <button className="button__form" style={{width:"70%"}} onClick={() => {setStep(2); setLoginType("password");}}>
+              Đăng nhập bằng mật khẩu
+            </button>
 
-  //           <button
-  //             className="button__form"
-  //             style={{ backgroundColor: "GrayText" }}
-  //             onClick={() => setWay("webauthn")}
-  //           >
-  //             Đăng nhập bằng WebAuthn
-  //           </button>
-  //           <br />
-  //           <span className="span__item" style={{ display: "flex" }}>
-  //             Chưa có tài khoản?
-  //             <a className="a__item" href="/sign-up">
-  //               Tạo tài khoản
-  //             </a>
-  //           </span>
-  //         </div>
+            <button
+              className="button__form"
+              style={{ backgroundColor: "GrayText", width:"70%" }}
+              onClick={() => {setStep(2); setLoginType("webauthn");}}
+            >
+              Đăng nhập bằng WebAuthn
+            </button>
+            <br />
+            <span className="span__item" style={{ display: "flex" }}>
+              Chưa có tài khoản?
+              <a className="a__item" href="/sign-up">
+                Tạo tài khoản
+              </a>
+            </span>
+          </div>
 
-  //         {/**---------------Signin Right------------------- */}
-  //         <div className="signin__item--2">
-  //           <img
-  //             src="https://salt.tikicdn.com/ts/upload/df/48/21/b4d225f471fe06887284e1341751b36e.png"
-  //             alt=""
-  //             className="signin__img"
-  //           />
-  //           <h3>Mua sắm tại Tiki</h3>
-  //           <p style={{ margin: "0px" }}>Siêu ưu đãi mỗi ngày</p>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+          {/**---------------Signin Right------------------- */}
+          <div className="signin__item--2">
+            <img
+              src="https://salt.tikicdn.com/ts/upload/df/48/21/b4d225f471fe06887284e1341751b36e.png"
+              alt=""
+              className="signin__img"
+            />
+            <h3>Mua sắm tại Tiki</h3>
+            <p style={{ margin: "0px" }}>Siêu ưu đãi mỗi ngày</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="signin__container">
@@ -274,8 +282,8 @@ const SignInPage = () => {
               </p>
             )}
 
-            <button 
-              className="button__form" 
+            <button
+              className="button__form"
               onClick={handleSubmit}
               disabled={isCheckingUsername}
             >
@@ -294,17 +302,7 @@ const SignInPage = () => {
           <div className="signin__item--1">
             <h1>Xin chào</h1>
             <p>Đăng nhập bằng WebAuthn</p>
-            <p style={{ fontSize: "small", color: "gray" }}>
-              Tài khoản của bạn có WebAuthn credentials
-            </p>
-
-            <input
-              className="input__form"
-              type="text"
-              placeholder="Username"
-              value={username}
-              disabled
-            />
+            <img src="./passkey-illustration-1.svg" alt="WebAuthn" style={{ marginBottom: "20px" }} />
 
             {errorMessage && (
               <p style={{ fontSize: "small", marginTop: "0px", color: "red" }}>
@@ -316,9 +314,17 @@ const SignInPage = () => {
               Đăng nhập bằng WebAuthn
             </button>
             <br />
-            <a className="a__item" href="#" onClick={(e) => { e.preventDefault(); handleBack(); }}>
-              Quay lại
-            </a>
+            {step == 3 ?
+              <>
+                <a className="a__item" href="#" onClick={(e) => { e.preventDefault(); handleBack(); }}>
+                  Quay lại
+                </a>
+              </> :
+              <>
+                <a className="a__item" href="#" onClick={(e) => { e.preventDefault(); handleChangeLoginType()}}>
+                  Phương thức đăng nhập khác
+                </a>
+              </>}
             <span className="span__item" style={{ display: "flex" }}>
               Chưa có tài khoản?
               <a className="a__item" href="/sign-up">
@@ -331,17 +337,9 @@ const SignInPage = () => {
           <div className="signin__item--1">
             <h1>Xin chào</h1>
             <p>Xác thực bảo mật 2 lớp</p>
-            <p style={{ fontSize: "small", color: "gray" }}>
-              Mật khẩu đã được xác thực. Vui lòng xác thực WebAuthn để hoàn tất đăng nhập.
-            </p>
-
-            <input
-              className="input__form"
-              type="text"
-              placeholder="Username"
-              value={username}
-              disabled
-            />
+            
+            
+            <img src="./passkey-illustration-1.svg" alt="WebAuthn" style={{ marginBottom: "20px" }} />
 
             {errorMessage && (
               <p style={{ fontSize: "small", marginTop: "0px", color: "red" }}>
